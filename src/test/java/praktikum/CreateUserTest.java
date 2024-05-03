@@ -10,9 +10,9 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 public class CreateUserTest {
-    public String userBody = "{\n\"email\": \"n@yandex.ru\",\"password\": \"n\",\n\"name\": \"n\"\n}";
+    public String userBody = "{\n\"email\": \"nikkex12345678@yandex.ru\",\"password\": \"nikkex12345678\",\n\"name\": \"nikkex12345678\"\n}";
     public String token;
-    public String userBodyWithoutName = "{\n\"email\": \"nickex101@yandex.ru\",\"password\": \"nickex101\"\n}";
+    public String userBodyWithoutName = "{\n\"email\": \"nikkex12345678@yandex.ru\",\"password\": \"nikkex12345678\"\n}";
 
     @Before
     public void setUp(){
@@ -24,7 +24,7 @@ public class CreateUserTest {
     @Description("Проверка статус кода ручки POST /api/auth/register")
     public void checkStatusCodeCreateUniqueUser(){
         UserAPI user = new UserAPI();
-        token = user.createUser(userBody).then().statusCode(200).extract().path("accessToken");
+        token = user.createUser(userBody).then().statusCode(200).extract().response().path("accessToken");
     }
 
     @Test
@@ -32,7 +32,7 @@ public class CreateUserTest {
     @Description("Проверка наличия значения true в ответе ручки POST /api/auth/register")
     public void checkBodyResponseCreateUniqueUser(){
         UserAPI user = new UserAPI();
-        token = user.createUser(userBody).then().assertThat().body("success", equalTo(true)).extract().path("accessToken");
+        token = user.createUser(userBody).then().assertThat().body("success", equalTo(true)).extract().response().path("accessToken");
     }
 
 
@@ -97,12 +97,8 @@ public class CreateUserTest {
     @After
     public void deleteUser(){
         UserAPI user = new UserAPI();
-        if(token == null){
-            user.deleteUser(token);
-        } else {
-            token = user.createUser(userBody).then().extract().path("accessToken");
+        if(token != null){
             user.deleteUser(token);
         }
     }
 }
-

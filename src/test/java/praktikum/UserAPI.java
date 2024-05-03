@@ -13,7 +13,15 @@ public class UserAPI {
 
     public void deleteUser(String token){
          given()
-                 .auth().oauth2(token)
+                 .header("Authorization", token)
                 .delete("/api/auth/user");
+    }
+
+    public Response loginUser(String userBody, String token){
+        return given()
+                .header("Content-type", "application/json")
+                .header("Authorization", token)
+                .body(userBody)
+                .post("/api/auth/login");
     }
 }
