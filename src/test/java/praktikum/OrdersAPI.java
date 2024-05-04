@@ -20,10 +20,15 @@ public class OrdersAPI {
                 .post("/api/orders");
     }
 
-    public Response getOrdersUser(String token){
-        return given()
-                .header("Authorization", token)
-                .get("/api/orders");
+    public Response getOrdersUser(String token, boolean authorized){
+        if(authorized){
+            return given()
+                    .header("Authorization", token)
+                    .get("/api/orders");
+        } else {
+            return given()
+                    .get("/api/orders");
+        }
     }
 
 }
