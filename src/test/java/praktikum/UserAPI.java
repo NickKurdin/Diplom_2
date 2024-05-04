@@ -24,4 +24,19 @@ public class UserAPI {
                 .body(userBody)
                 .post("/api/auth/login");
     }
+
+    public Response updateUserData(String editData, String token, boolean authorized){
+        if(authorized) {
+            return given()
+                    .header("Content-type", "application/json")
+                    .header("Authorization", token)
+                    .body(editData)
+                    .patch("/api/auth/user");
+        } else {
+            return given()
+                    .header("Content-type", "application/json")
+                    .body(editData)
+                    .patch("/api/auth/user");
+        }
+    }
 }
