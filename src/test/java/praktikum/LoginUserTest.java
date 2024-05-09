@@ -9,85 +9,50 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.hamcrest.CoreMatchers.equalTo;
 
-public class LoginUserTest {
-    public String userBodyForCreate = "{\n\"email\": \"nikkex12345678@yandex.ru\",\"password\": \"nikkex12345678\",\n\"name\": \"nikkex12345678\"\n}";
-    public String token;
-    public String userBodyWithIncorrectPassword = "{\n\"email\": \"nikkex12345678@yandex.ru\",\"password\": \"nickex123456789\"\n}";
-    public String userBodyWithCorrectPassword = "{\n\"email\": \"nikkex12345678@yandex.ru\",\"password\": \"nikkex12345678\"\n}";
+public class LoginUserTest extends APITesting{
 
     @Before
     public void setUp(){
-        RestAssured.baseURI = "https://stellarburgers.nomoreparties.site";
+        RestAssured.baseURI = url;
     }
 
 
     @Test
-    @DisplayName("Проверка статус кода при авторизации пользователя с корректными данными")
-    @Description("Проверка статус кода при авторизации пользователя с корректными данными в ручке POST /api/auth/login")
-    public void checkStatusCodeInLoginUserWithCorrectPass(){
+    @DisplayName("Проверка статус кода и тела ответа при авторизации пользователя с корректными данными")
+    @Description("Проверка статус кода и тела ответа при авторизации пользователя с корректными данными в ручке POST /api/auth/login")
+    public void checkStatusCodeAndResponseInLoginUserWithCorrectPass(){
         UserAPI user = new UserAPI();
-        createUserForCheckStatusCode(user);
-        loginUserAndCheckStatusCode(user);
+        createUserForCheckStatusCodeAndResponse(user);
+        loginUserAndCheckStatusCodeAndResponse(user);
     }
     @Step("Создание пользователя")
-    public void createUserForCheckStatusCode(UserAPI user){
-        token = user.createUser(userBodyForCreate).then().extract().path("accessToken");
+    public void createUserForCheckStatusCodeAndResponse(UserAPI user){
+        userBody = new User(email, password, name);
+        token = user.createUser(userBody).then().extract().path("accessToken");
     }
-    @Step("Авторизация пользователя и проверка статус кода")
-    public void loginUserAndCheckStatusCode(UserAPI user){
-        token = user.loginUser(userBodyWithCorrectPassword, token).then().statusCode(200).extract().path("accessToken");
-    }
-
-    @Test
-    @DisplayName("Проверка тела ответа при авторизации пользователя с корректными данными")
-    @Description("Проверка тела ответа при авторизации пользователя с корректными данными в ручке POST /api/auth/login")
-    public void checkResponseInLoginUserWithCorrectPass(){
-        UserAPI user = new UserAPI();
-        createUserForCheckResponse(user);
-        loginUserAndCheckResponse(user);
-    }
-    @Step("Создание пользователя")
-    public void createUserForCheckResponse(UserAPI user){
-        token = user.createUser(userBodyForCreate).then().extract().path("accessToken");
-    }
-    @Step("Авторизация пользователя и проверка статус кода")
-    public void loginUserAndCheckResponse(UserAPI user){
-        token = user.loginUser(userBodyWithCorrectPassword, token).then().body("success", equalTo(true)).extract().path("accessToken");
+    @Step("Авторизация пользователя, проверка статус кода и тела ответа")
+    public void loginUserAndCheckStatusCodeAndResponse(UserAPI user){
+        token = user.loginUser(userBody, token).then().statusCode(200).and().body("success", equalTo(true)).extract().path("accessToken");
     }
 
 
     @Test
-    @DisplayName("Проверка статус кода при авторизации пользователя с некорректными данными")
-    @Description("Проверка статус кода при авторизации пользователя с некорректными данными в ручке POST /api/auth/login")
-    public void checkStatusCodeInLoginUserWithIncorrectPass(){
+    @DisplayName("Проверка статус кода и тела ответа при авторизации пользователя с некорректными данными")
+    @Description("Проверка статус кода и тела ответа при авторизации пользователя с некорректными данными в ручке POST /api/auth/login")
+    public void checkStatusCodeInLoginUserWithIncorrectPassAndResponse(){
         UserAPI user = new UserAPI();
-        createUserWithIncorrectPassForCheckStatusCode(user);
-        loginUserWithIncorrectPassAndCheckStatusCode(user);
+        createUserForCheckStatusCodeAndResponseAfterLoginWithIncorrectPassword(user);
+        loginUserWithIncorrectPassAndCheckStatusCodeAndResponse(user);
     }
     @Step("Создание пользователя")
-    public void createUserWithIncorrectPassForCheckStatusCode(UserAPI user){
-        token = user.createUser(userBodyForCreate).then().extract().path("accessToken");
+    public void createUserForCheckStatusCodeAndResponseAfterLoginWithIncorrectPassword(UserAPI user){
+        userBody = new User(email, password, name);
+        token = user.createUser(userBody).then().extract().path("accessToken");
     }
-    @Step("Авторизация пользователя и проверка статус кода")
-    public void loginUserWithIncorrectPassAndCheckStatusCode(UserAPI user){
-        user.loginUser(userBodyWithIncorrectPassword, token).then().statusCode(401);
-    }
-
-    @Test
-    @DisplayName("Проверка тела ответа при авторизации пользователя с некорректными данными")
-    @Description("Проверка тела ответа при авторизации пользователя с некорректными данными в ручке POST /api/auth/login")
-    public void checkResponseInLoginUserWithIncorrectPass(){
-        UserAPI user = new UserAPI();
-        createUserWithIncorrectPassForCheckResponse(user);
-        loginUserWithIncorrectPassAndCheckResponse(user);
-    }
-    @Step("Создание пользователя")
-    public void createUserWithIncorrectPassForCheckResponse(UserAPI user){
-        token = user.createUser(userBodyForCreate).then().extract().path("accessToken");
-    }
-    @Step("Авторизация пользователя и проверка тела ответа")
-    public void loginUserWithIncorrectPassAndCheckResponse(UserAPI user){
-        user.loginUser(userBodyWithIncorrectPassword, token).then().body("success", equalTo(false)).extract().path("accessToken");
+    @Step("Авторизация пользователя, проверка статус кода и тела ответа")
+    public void loginUserWithIncorrectPassAndCheckStatusCodeAndResponse(UserAPI user){
+        userBody = new User(email, incorrectPassword);
+        user.loginUser(userBody, token).then().statusCode(401).and().assertThat().body("success", equalTo(false));
     }
 
 

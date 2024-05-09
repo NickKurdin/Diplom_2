@@ -10,191 +10,89 @@ import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
-public class UpdateUserDataTest {
-    public String userBodyForCreate = "{\n\"email\": \"nikkex12345678@yandex.ru\",\"password\": \"nikkex12345678\",\n\"name\": \"nikkex12345678\"\n}";
-    public String token;
-    public String updateUserName = "{\n\"name\": \"nickex\"\n}";
-    public String updateExistUserEmail = "{\n\"email\": \"nickex@yandex.ru\"\n}";
-    public String updateUserEmail = "{\n\"email\": \"nikkex12345678000@yandex.ru\"\n}";
+public class UpdateUserDataTest extends APITesting {
 
     @Before
     public void setUp(){
-        RestAssured.baseURI = "https://stellarburgers.nomoreparties.site";
+        RestAssured.baseURI = url;
     }
 
     @Test
-    @DisplayName("Проверка статус кода при обновлении имени авторизованного пользователя")
-    @Description("Проверка статус кода при обновлении имени авторизованного пользователя в ручке PATCH /api/auth/user")
-    public void checkStatusCodeAndUpdateUserName(){
+    @DisplayName("Проверка статус кода и тела ответа при обновлении имени авторизованного пользователя")
+    @Description("Проверка статус кода и тела ответа при обновлении имени авторизованного пользователя в ручке PATCH /api/auth/user")
+    public void checkStatusCodeAndResponseUpdateUserName(){
         UserAPI user = new UserAPI();
-        createUserForCheckStatusCodeInUpdateUserName(user);
-        updateUserNameForCheckStatusCode(user);
+        createUserForCheckStatusCodeAndResponseInUpdateUserName(user);
+        updateUserNameForCheckStatusCodeAndResponse(user);
     }
     @Step("Создание пользователя")
-    public void createUserForCheckStatusCodeInUpdateUserName(UserAPI user){
-        token = user.createUser(userBodyForCreate).then().extract().path("accessToken");
+    public void createUserForCheckStatusCodeAndResponseInUpdateUserName(UserAPI user){
+        userBody = new User(email, password, name);
+        token = user.createUser(userBody).then().extract().path("accessToken");
     }
     @Step("Обновление имени пользователя")
-    public void updateUserNameForCheckStatusCode(UserAPI user){
-        user.updateUserData(updateUserName, token, true).then().statusCode(200);
-    }
-
-    @Test
-    @DisplayName("Проверка тела ответа при обновлении имени авторизованного пользователя")
-    @Description("Проверка тела ответа при обновлении имени авторизованного пользователя в ручке PATCH /api/auth/user")
-    public void checkResponseAndUpdateUserName(){
-        UserAPI user = new UserAPI();
-        createUserForResponseCodeInUpdateUserName(user);
-        updateUserNameForCheckResponse(user);
-    }
-    @Step("Создание пользователя")
-    public void createUserForResponseCodeInUpdateUserName(UserAPI user){
-        token = user.createUser(userBodyForCreate).then().extract().path("accessToken");
-    }
-    @Step("Обновление имени пользователя")
-    public void updateUserNameForCheckResponse(UserAPI user){
-        user.updateUserData(updateUserName, token, true).then().body("success", equalTo(true));
+    public void updateUserNameForCheckStatusCodeAndResponse(UserAPI user){
+        user.updateUserData(updateUserName, token).then().statusCode(200).and().body("success", equalTo(true));
     }
 
 
     @Test
-    @DisplayName("Проверка статус кода при обновлении имени неавторизованного пользователя")
-    @Description("Проверка статус кода при обновлении имени неавторизованного пользователя в ручке PATCH /api/auth/user")
-    public void checkStatusCodeAndUpdateUnauthorizedUserName(){
+    @DisplayName("Проверка статус кода и тела ответа при обновлении имени неавторизованного пользователя")
+    @Description("Проверка статус кода и тела ответа при обновлении имени неавторизованного пользователя в ручке PATCH /api/auth/user")
+    public void checkStatusCodeAndResponseUpdateUnauthorizedUserName(){
         UserAPI user = new UserAPI();
-        createUserForCheckStatusCodeInUnauthorizedUpdateUserName(user);
-        updateUnauthorizedUserNameForCheckStatusCode(user);
-    }
-    @Step("Создание пользователя")
-    public void createUserForCheckStatusCodeInUnauthorizedUpdateUserName(UserAPI user){
-        token = user.createUser(userBodyForCreate).then().extract().path("accessToken");
-    }
-    @Step("Обновление имени пользователя")
-    public void updateUnauthorizedUserNameForCheckStatusCode(UserAPI user){
-        user.updateUserData(updateUserName, token, false).then().body("success", equalTo(false));
-    }
-
-    @Test
-    @DisplayName("Проверка тела ответа при обновлении имени неавторизованного пользователя")
-    @Description("Проверка тела ответа при обновлении имени неавторизованного пользователя в ручке PATCH /api/auth/user")
-    public void checkResponseAndUpdateUnauthorizedUserName(){
-        UserAPI user = new UserAPI();
-        createUserForCheckResponseInUnauthorizedUpdateUserName(user);
-        updateUnauthorizedUserNameForCheckResponse(user);
-    }
-    @Step("Создание пользователя")
-    public void createUserForCheckResponseInUnauthorizedUpdateUserName(UserAPI user){
-        token = user.createUser(userBodyForCreate).then().extract().path("accessToken");
-    }
-    @Step("Обновление имени пользователя")
-    public void updateUnauthorizedUserNameForCheckResponse(UserAPI user){
-        user.updateUserData(updateUserName, token, false).then().statusCode(401);
+        token = "token";
+        user.updateUserData(updateUserName, token).then().statusCode(401).and().body("success", equalTo(false));
     }
 
 
     @Test
-    @DisplayName("Проверка статус кода при обновлении почты авторизованного пользователя")
-    @Description("Проверка статус кода при обновлении почты авторизованного пользователя в ручке PATCH /api/auth/user")
-    public void checkStatusCodeAndUpdateUserEmail(){
+    @DisplayName("Проверка статус кода и тела ответа при обновлении почты авторизованного пользователя")
+    @Description("Проверка статус кода и тела ответа при обновлении почты авторизованного пользователя в ручке PATCH /api/auth/user")
+    public void checkStatusCodeAndResponseUpdateUserEmail(){
         UserAPI user = new UserAPI();
-        createUserForCheckStatusCodeInUpdateUserEmail(user);
-        updateUserEmailForCheckStatusCode(user);
+        createUserForCheckStatusCodeAndResponseInUpdateUserEmail(user);
+        updateUserEmailForCheckStatusCodeAndResponse(user);
     }
     @Step("Создание пользователя")
-    public void createUserForCheckStatusCodeInUpdateUserEmail(UserAPI user){
-        token = user.createUser(userBodyForCreate).then().extract().path("accessToken");
+    public void createUserForCheckStatusCodeAndResponseInUpdateUserEmail(UserAPI user){
+        userBody = new User(email, password, name);
+        token = user.createUser(userBody).then().extract().path("accessToken");
     }
     @Step("Обновление почты пользователя")
-    public void updateUserEmailForCheckStatusCode(UserAPI user){
-        user.updateUserData(updateUserEmail, token, true).then().statusCode(200);
-    }
-
-    @Test
-    @DisplayName("Проверка тела ответа при обновлении почты авторизованного пользователя")
-    @Description("Проверка тела ответа при обновлении почты авторизованного пользователя в ручке PATCH /api/auth/user")
-    public void checkResponseAndUpdateUserEmail(){
-        UserAPI user = new UserAPI();
-        createUserForCheckResponseInUpdateUserEmail(user);
-        updateUserEmailForCheckResponse(user);
-    }
-    @Step("Создание пользователя")
-    public void createUserForCheckResponseInUpdateUserEmail(UserAPI user){
-        token = user.createUser(userBodyForCreate).then().extract().path("accessToken");
-    }
-    @Step("Обновление почты пользователя")
-    public void updateUserEmailForCheckResponse(UserAPI user){
-        user.updateUserData(updateUserEmail, token, true).then().body("success", equalTo(true));
+    public void updateUserEmailForCheckStatusCodeAndResponse(UserAPI user){
+        user.updateUserData(updateUserEmail, token).then().statusCode(200).and().body("success", equalTo(true));
     }
 
 
     @Test
-    @DisplayName("Проверка статус кода при обновлении почты неавторизованного пользователя")
-    @Description("Проверка статус кода при обновлении почты неавторизованного пользователя в ручке PATCH /api/auth/user")
-    public void checkStatusCodeAndUpdateUnauthorizedUserEmail(){
+    @DisplayName("Проверка статус кода и тела ответа при обновлении почты неавторизованного пользователя")
+    @Description("Проверка статус кода и тела ответа при обновлении почты неавторизованного пользователя в ручке PATCH /api/auth/user")
+    public void checkStatusAndResponseCodeAndUpdateUnauthorizedUserEmail(){
         UserAPI user = new UserAPI();
-        createUserForCheckStatusCodeInUpdateUnauthorizedUserEmail(user);
-        updateUnauthorizedUserEmailForCheckStatusCode(user);
-    }
-    @Step("Создание пользователя")
-    public void createUserForCheckStatusCodeInUpdateUnauthorizedUserEmail(UserAPI user){
-        token = user.createUser(userBodyForCreate).then().extract().path("accessToken");
-    }
-    @Step("Обновление почты пользователя")
-    public void updateUnauthorizedUserEmailForCheckStatusCode(UserAPI user){
-        user.updateUserData(updateUserEmail, token, false).then().statusCode(401);
-    }
-
-    @Test
-    @DisplayName("Проверка тела ответа при обновлении почты неавторизованного пользователя")
-    @Description("Проверка тела ответа при обновлении почты неавторизованного пользователя в ручке PATCH /api/auth/user")
-    public void checkResponseAndUpdateUnauthorizedUserEmail(){
-        UserAPI user = new UserAPI();
-        createUserForCheckResponseInUpdateUnauthorizedUserEmail(user);
-        updateUnauthorizedUserEmailForCheckResponse(user);
-    }
-    @Step("Создание пользователя")
-    public void createUserForCheckResponseInUpdateUnauthorizedUserEmail(UserAPI user){
-        token = user.createUser(userBodyForCreate).then().extract().path("accessToken");
-    }
-    @Step("Обновление почты пользователя")
-    public void updateUnauthorizedUserEmailForCheckResponse(UserAPI user){
-        user.updateUserData(updateUserEmail, token, false).then().body("success", equalTo(false));
+        token = "token";
+        user.updateUserData(updateUserEmail, token).then().statusCode(401).and().body("success", equalTo(false));
     }
 
 
     @Test
-    @DisplayName("Проверка статус кода при обновлении почты занятым значением авторизованного пользователя")
-    @Description("Проверка статус кода при обновлении почты занятым значением авторизованного пользователя в ручке PATCH /api/auth/user")
-    public void checkStatusCodeAndUpdateUserExistEmail(){
+    @DisplayName("Проверка статус кода и тела ответа при обновлении почты занятым значением авторизованного пользователя")
+    @Description("Проверка статус кода и тела ответа при обновлении почты занятым значением авторизованного пользователя в ручке PATCH /api/auth/user")
+    public void checkStatusCodeAndResponseUpdateUserExistEmail(){
         UserAPI user = new UserAPI();
-        createUserForCheckStatusCodeInUpdateUserExistEmail(user);
-        updateUserExistEmailForCheckStatusCode(user);
+        createUserForCheckStatusCodeAndResponseInUpdateUserExistEmail(user);
+        updateUserExistEmailForCheckStatusCodeAndResponse(user);
     }
     @Step("Создание пользователя")
-    public void createUserForCheckStatusCodeInUpdateUserExistEmail(UserAPI user){
-        token = user.createUser(userBodyForCreate).then().extract().path("accessToken");
+    public void createUserForCheckStatusCodeAndResponseInUpdateUserExistEmail(UserAPI user){
+        userBody = new User(email, password, name);
+        token = user.createUser(userBody).then().extract().path("accessToken");
     }
     @Step("Обновление почты пользователя")
-    public void updateUserExistEmailForCheckStatusCode(UserAPI user){
-        user.updateUserData(updateExistUserEmail, token, true).then().statusCode(403);
+    public void updateUserExistEmailForCheckStatusCodeAndResponse(UserAPI user){
+        user.updateUserData(updateExistUserEmail, token).then().statusCode(403).and().body("message", equalTo("User with such email already exists"));
     }
 
-    @Test
-    @DisplayName("Проверка тела ответа при обновлении почты занятым значением авторизованного пользователя")
-    @Description("Проверка тела ответа при обновлении почты занятым значением авторизованного пользователя в ручке PATCH /api/auth/user")
-    public void checkResponseAndUpdateUserExistEmail(){
-        UserAPI user = new UserAPI();
-        createUserForResponseCodeInUpdateUserExistEmail(user);
-        updateUserExistEmailForCheckResponse(user);
-    }
-    @Step("Создание пользователя")
-    public void createUserForResponseCodeInUpdateUserExistEmail(UserAPI user){
-        token = user.createUser(userBodyForCreate).then().extract().path("accessToken");
-    }
-    @Step("Обновление почты пользователя")
-    public void updateUserExistEmailForCheckResponse(UserAPI user){
-        user.updateUserData(updateExistUserEmail, token, true).then().body("message", equalTo("User with such email already exists"));
-    }
 
     @After
     public void deleteUser(){
