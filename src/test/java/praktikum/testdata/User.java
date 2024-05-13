@@ -1,4 +1,4 @@
-package praktikum;
+package praktikum.testdata;
 
 public class User {
     private String email;
@@ -27,12 +27,23 @@ public class User {
         this.email = email;
     }
 
+    public User setEmailForBody(String email) {
+        this.email = email;
+        return this;
+    }
+
     public String getPassword() {
         return password;
     }
 
+
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public User setPasswordForBody(String password) {
+        this.password = password;
+        return this;
     }
 
     public String getName() {
@@ -41,5 +52,10 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public User setNameForBody(String name) {
+        this.name = name;
+        return this;
     }
 }

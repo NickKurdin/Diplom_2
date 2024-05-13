@@ -1,6 +1,9 @@
-package praktikum;
+package praktikum.api;
 
 import io.restassured.response.Response;
+import praktikum.testdata.User;
+import praktikum.utils.Specifications;
+
 import static io.restassured.RestAssured.given;
 
 public class UserAPI {
@@ -10,6 +13,7 @@ public class UserAPI {
 
     public Response createUser(User userBody){
         return given()
+                .spec(Specifications.requestSpecification())
                 .header("Content-type", "application/json")
                 .body(userBody)
                 .post(register);
@@ -17,27 +21,31 @@ public class UserAPI {
 
     public void deleteUser(String token){
          given()
+                 .spec(Specifications.requestSpecification())
                  .header("Authorization", token)
                 .delete(user);
     }
 
     public Response loginUser(User userBody, String token){
         return given()
+                .spec(Specifications.requestSpecification())
                 .header("Content-type", "application/json")
                 .header("Authorization", token)
                 .body(userBody)
                 .post(login);
     }
 
-    public Response updateUserData(String editData, String token){
+    public Response updateUserData(User editData, String token){
         if(token != null) {
             return given()
+                    .spec(Specifications.requestSpecification())
                     .header("Content-type", "application/json")
                     .header("Authorization", token)
                     .body(editData)
                     .patch(user);
         } else {
             return given()
+                    .spec(Specifications.requestSpecification())
                     .header("Content-type", "application/json")
                     .body(editData)
                     .patch(user);

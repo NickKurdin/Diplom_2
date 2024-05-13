@@ -3,23 +3,39 @@ package praktikum;
 import io.qameta.allure.Description;
 import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
-import io.restassured.RestAssured;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import praktikum.api.APITesting;
+import praktikum.api.OrdersAPI;
+import praktikum.api.UserAPI;
+import praktikum.testdata.Order;
+import praktikum.testdata.User;
 
+import java.util.ArrayList;
+import java.util.List;
 import static org.hamcrest.CoreMatchers.equalTo;
 
-public class CreateOrderTest extends APITesting {
+public class CreateOrderTest{
+    private Order orderBodyForTest;
+    private APITesting test;
+    private UserAPI user;
+    private OrdersAPI order;
+    private User userBody;
+
 
     @Before
     public void setUp(){
-        RestAssured.baseURI = url;
-        OrdersAPI order = new OrdersAPI();
-        firstIngredient = order.getIngredientsForOrder().then().extract().path("data[0]._id");
-        secondIngredient = order.getIngredientsForOrder().then().extract().path("data[1]._id");
-        orderBody = "{\n\"ingredients\": [\"" + firstIngredient +"\", \"" + secondIngredient +"\"]\n}";
-        orderBodyWithIncorrectIngredients = "{\n\"ingredients\": [\"" + firstIngredient +"\", \"" + secondIngredient + "0000oooo" +"\"]\n}";
+        order = new OrdersAPI();
+        orderBodyForTest = new Order();
+        user = new UserAPI();
+        userBody = new User();
+        test = new APITesting();
+        userBody = new User(test.email, test.password, test.name);
+        List<String> ingredients = new ArrayList<>();
+        ingredients.add(test.firstIngredient);
+        ingredients.add(test.secondIngredient);
+        orderBodyForTest = orderBodyForTest.setIngredients(ingredients);
     }
 
     @Test
@@ -31,14 +47,11 @@ public class CreateOrderTest extends APITesting {
     }
     @Step("Создание пользователя")
     public void createUserForCheckStatusCodeAndResponseInCreateOrderWithAuthorization(){
-        UserAPI user = new UserAPI();
-        userBody = new User(email, password, name);
-        token = user.createUser(userBody).then().extract().path("accessToken");
+        test.token = user.createUser(userBody).then().extract().path("accessToken");
     }
     @Step("Создание заказа, проверка статус кода и тела ответа")
     public void createOrderForCheckStatusCodeAndResponseInCreateOrderWithAuthorization(){
-        OrdersAPI order = new OrdersAPI();
-        order.createOrder(orderBody, token).then().statusCode(200).and().body("success", equalTo(true));
+        order.createOrder(orderBodyForTest, test.token).then().statusCode(200).and().body("success", equalTo(true));
     }
 
 
@@ -46,17 +59,15 @@ public class CreateOrderTest extends APITesting {
     @DisplayName("Проверка статус кода и тела ответа при создании заказа без авторизации")
     @Description("Проверка статус кода и тела ответа при создании заказа без авторизации в ручке POST /api/orders")
     public void checkStatusCodeAndResponseCreateOrderWithoutAuthorization(){
-        OrdersAPI order = new OrdersAPI();
-        order.createOrderWithoutAuthorization(orderBody).then().statusCode(200).and().body("success", equalTo(true));
+        order.createOrderWithoutAuthorization(orderBodyForTest).then().statusCode(200).and().body("success", equalTo(true));
     }
 
 
     @Test
-    @DisplayName("Проверка статус кода при создании заказа без ингредиентов")
-    @Description("Проверка статус кода при создании заказа без ингредиентов в ручке POST /api/orders")
+    @DisplayName("Проверка статус кода и тела ответа при создании заказа без ингредиентов")
+    @Description("Проверка статус кода и тела ответа при создании заказа без ингредиентов в ручке POST /api/orders")
     public void checkStatusCodeAndResponseCreateOrderWithoutIngredients(){
-        OrdersAPI order = new OrdersAPI();
-        order.createOrderWithoutAuthorization(orderBodyWithoutIngredients).then().statusCode(400).and().body("success", equalTo(false));
+        order.createOrderWithoutAuthorization(orderBodyForTest.setIngredients(test.orderBodyWithoutIngredients)).then().statusCode(400).and().body("success", equalTo(false));
     }
 
 
@@ -64,15 +75,13 @@ public class CreateOrderTest extends APITesting {
     @DisplayName("Проверка статус кода при создании заказа с некорректными ингридиентами")
     @Description("Проверка статус кода при создании заказа с некорректными ингридиентами в ручке POST /api/orders")
     public void checkStatusCodeCreateOrderWithIncorrectIngredients(){
-        OrdersAPI order = new OrdersAPI();
-        order.createOrderWithoutAuthorization(orderBodyWithIncorrectIngredients).then().statusCode(500);
+        order.createOrderWithoutAuthorization(orderBodyForTest.setIngredients(test.incorrectIngredients)).then().statusCode(500);
     }
 
     @After
     public void deleteUser(){
-        UserAPI user = new UserAPI();
-        if(token != null){
-            user.deleteUser(token);
+        if(test.token != null){
+            user.deleteUser(test.token);
         }
     }
 }
